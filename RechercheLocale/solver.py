@@ -1,8 +1,8 @@
 from uflp import UFLP
 from typing import List, Tuple
 """ 
-    Binome 1 : Nom Prenom (Matricule)
-    Binome 2 : Nom Prenom (Matricule)
+    Binome 1 : Taylor Jacob (2117518)
+    Binome 2 : Bédard-Côté Laurie (2086165)
     Description succinte de l'implementation :
     ...
 """
