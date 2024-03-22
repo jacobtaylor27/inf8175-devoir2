@@ -27,11 +27,13 @@ def solve(problem: UFLP) -> Tuple[List[int], List[int]]:
     mainStations = initialOpenedStations
     satelliteStations = initialSatelliteStationAssociation
 
-    maxReset = 25
+    maxReset = 150
     resetCounter = 0
     bestSolutionFound = (mainStations, satelliteStations)
+    maxBestSolutionFoundRepetitions = 5
+    bestSolutionFoundRepetitions = 0
 
-    while resetCounter < maxReset:
+    while (resetCounter < maxReset) and (bestSolutionFoundRepetitions < maxBestSolutionFoundRepetitions):
         currentCost = problem.calculate_cost(mainStations, satelliteStations)
         
         neighbors = findNeighboringSolutions(problem, mainStations)
@@ -40,9 +42,16 @@ def solve(problem: UFLP) -> Tuple[List[int], List[int]]:
         
         if len(validNeighbors) == 0:
             resetCounter += 1
+            print("No valid neighbors found, resetting... ", resetCounter)
+            print(currentCost)
+
+            if (bestSolutionFound[0] == mainStations) and (bestSolutionFound[1] == satelliteStations):
+                bestSolutionFoundRepetitions += 1
+                print("Best solution found repeated ", bestSolutionFoundRepetitions, " times")
             
-            if (currentCost < problem.calculate_cost(bestSolutionFound[0], bestSolutionFound[1])):
+            elif (currentCost < problem.calculate_cost(bestSolutionFound[0], bestSolutionFound[1])):
                 bestSolutionFound = (mainStations, satelliteStations)
+                bestSolutionFoundRepetitions = 0
             
             mainStations, satelliteStations = generateRandomSolution(problem)
             continue
