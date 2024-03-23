@@ -53,6 +53,15 @@ constraint forall(i, j in dim) (
 );
 
 % symmetry
+% Constraint to place "R" towers only in the top half of the terrain
+constraint forall(i, j in dim where i > j) (
+    terrain[i, j] != R
+);
+
+% Constraint to place "B" towers only in the other top half of the terrain
+constraint forall(i, j in dim where i < j) (
+    terrain[i, j] != B
+);
 
 
 constraint total_commun = countR;
