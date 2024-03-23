@@ -30,29 +30,30 @@ var int: countB = count([terrain[i, j] | i, j in dim], B);
 constraint countR = countB;
 
 % les tours de couleurs diff ne doivent pas interferer leurs signaux (h, v, d)
-function var bool: hasClearLineOfSight(array[int] of etat: line, etat: color) =
+function var bool: hasClearLineOfSight(array[int] of var etat: line, etat: color) =
     forall(i in index_set(line)) (
-        line[i] == color \/ line[i] == V
+        line[i] = color \/ line[i] = V
+    );
+    
+    
+function var bool: hasClearDiagOfSight(int: x, int: y, etat: color) =
+    forall(i, j in 1..n where abs(i - x) = abs(j - y) /\ i != x /\ j != y)(
+        terrain[i, j] = color \/ terrain[i, j] = V
     );
 
+% row et colums  et diagonals check
 constraint forall(i, j in dim) (
-  if terrain[i, j] != V then
-    let {
-      array[int] of etat: row = [terrain[i, k] | k in dim];
-      array[int] of etat: col = [terrain[k, j] | k in dim];
-      array[int] of etat: diag1 = [terrain[k, k+i-j] | k in 1+i-max(i,j)..dim];
-      array[int] of etat: diag2 = [terrain[k, j+i-k] | k in max(i,j)-i+1..min(dim, i+j-1)];
-    } in
-    hasClearLineOfSight(row, terrain[i, j]) /\
-    hasClearLineOfSight(col, terrain[i, j]) /\
-    hasClearLineOfSight(diag1, terrain[i, j]) /\
-    hasClearLineOfSight(diag2, terrain[i, j])
+  if terrain[i,j] = R then
+    hasClearLineOfSight(row(terrain,i), R) /\
+    hasClearLineOfSight(col(terrain,j), R) /\
+    hasClearDiagOfSight(i,j, R)
   else
     true
   endif
 );
 
-% symmetry (speed)
+% symmetry
+
 
 constraint total_commun = countR;
 solve maximize total_commun;
