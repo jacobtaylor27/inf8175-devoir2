@@ -6,12 +6,18 @@ import time
     Binome 1 : Taylor Jacob (2117518)
     Binome 2 : Bédard-Côté Laurie (2086165)
     Description succinte de l'implementation :
-    ...
+        - On commence par générer une solution initiale en ouvrant seulement la station avec le coût d'ouverture minimum et en associant toutes les stations satellites à cette station
+        - On génère des solutions voisines en ouvrant une station fermée à la fois
+        - On valide les solutions voisines en ne gardant que celles dont le coût est inférieur à la solution actuelle
+        - On choisit la meilleure solution parmi les solutions valides
+        - Si on atteint un minimum local, on génère une nouvelle solution aléatoire
+        - On répète les étapes précédentes jusqu'à ce qu'on atteigne un des critères d'arrêt (temps écoulé, nombre de resets, convergence)
+        - On retourne la meilleure solution trouvée
 """
 
-# These constants are kind of arbitrary, but they seem to work well
-MAX_RESET = 150 # Maximum number of resets for the local search
-MAX_CONVERGENCE = 15 # Maximum number of times a solution can be found until we accept the best solution found as the final solution
+# These constants are kind of arbitrary, but they seem to work well for the given problem instances
+MAX_RESET = 150 # Maximum number of resets for the local search (resets are done when the search reaches a local minimum)
+MAX_CONVERGENCE = 10 # Maximum number of times a solution can be found until we accept the best solution found as the final solution
 MAX_SECONDS = 100 # Maximum number of seconds for the local search (little less then 2 minutes)
 
 def solve(problem: UFLP) -> Tuple[List[int], List[int]]:
@@ -44,18 +50,18 @@ def solve(problem: UFLP) -> Tuple[List[int], List[int]]:
         
         if len(validNeighbors) == 0: # this means that the current solution is a local minimum
             resetCounter += 1
-            print(f'RESET COUNTER -> [{resetCounter}]')
+            # print(f'RESET COUNTER -> [{resetCounter}]')
 
             # Check if the best solution found is repeated multiple times (converging)
             if (bestSolutionFound[0] == mainStations) and (bestSolutionFound[1] == satelliteStations):
                 convergenceCounter += 1
-                print(f'CONVERGENCE COUNTER -> [{convergenceCounter}]')
+                # print(f'CONVERGENCE COUNTER -> [{convergenceCounter}]')
 
             # Update the best solution found if the current solution is better            
             elif (currentCost < problem.calculate_cost(bestSolutionFound[0], bestSolutionFound[1])):
                 bestSolutionFound = (mainStations, satelliteStations)
                 convergenceCounter = 0 # Reset the convergence counter because we found a better solution
-                print(f'NEW COST -> [{round(currentCost)}]')
+                # print(f'NEW COST -> [{round(currentCost)}]')
             
             # Generate a new random solution
             mainStations, satelliteStations = generateRandomSolution(problem)
@@ -86,13 +92,16 @@ def shouldStop(convergenceCounter: int, resetCounter: int, startTime: float) -> 
 
 def generateRandomSolution(problem: UFLP) -> Tuple[List[int], List[int]]:
     """
-    Generate a random solution
+    Retourne une solution aléatoire au probleme : à battre pour avoir la moyenne.
+    Cette implémentation a été reprise de random_solver.py
 
     Args:
-        problem (UFLP): The problem instance
+        problem (UFLP): L'instance du probleme à résoudre
 
     Returns:
-        Tuple[List[int], List[int]]: The random solution
+        Tuple[List[int], List[int]]: 
+        La premiere valeur est une liste représentant les stations principales ouvertes au format [0, 1, 0] qui indique que seule la station 1 est ouverte
+        La seconde valeur est une liste représentant les associations des stations satellites au format [1 , 4] qui indique que la premiere station est associée à la station pricipale d'indice 1 et la deuxieme à celle d'indice 4
     """
 
     # Ouverture aléatoire des stations principales
@@ -110,7 +119,7 @@ def generateRandomSolution(problem: UFLP) -> Tuple[List[int], List[int]]:
 
 def generateInitialSolution(problem: UFLP) -> Tuple[List[int], List[int]]:
     """
-    Generate the initial solution by opening the station with the minimum opening cost and associating all satellite stations to it
+    Generate the initial solution by opening only the station with the minimum opening cost and associating all satellite stations to it
 
     Args:
         problem (UFLP): The problem instance
