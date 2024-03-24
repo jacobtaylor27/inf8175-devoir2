@@ -5,6 +5,7 @@ import time
 """ 
     Binome 1 : Taylor Jacob (2117518)
     Binome 2 : Bédard-Côté Laurie (2086165)
+    Méthode de résolution : Recherche locale avec l'algorithme de Hill Climbing
     Description succinte de l'implementation :
         - On commence par générer une solution initiale en ouvrant seulement la station avec le coût d'ouverture minimum et en associant toutes les stations satellites à cette station
         - On génère des solutions voisines en ouvrant une station fermée à la fois
