@@ -21,17 +21,18 @@ var int: longueur;
 %-----------------------------------------------------------------------------%
 % Partie étudiant
 %-----------------------------------------------------------------------------%
-% chaque freq est un entier en ordre croissant sur la plage
+% Les fréquences doivent être en ordre croissant
 constraint strictly_increasing(frequences);
 
-% premiere freq commence a 0
+% La première fréquence commence à 0
 constraint frequences[1] = 0;
 
 % derniere valeur indique la longueur totale de la plage
 
-% freq rependues a des distance differentes sur la plage : chaque chiffre dans distances est diff
+% Les distances entre les fréquences doivent être différentes
 constraint all_different(distances);
 
+% La longueur totale est déterminée par la dernière fréquence
 longueur = frequences[m];
 
 solve minimize longueur;
